@@ -30,16 +30,31 @@ replaces<-function(vector) {
 }
 
 
+
+
 data <- read.csv2("data/inflation.csv", header = FALSE 
                   , col.names = c("cdate" , "inflation")
                   , colClasses = c("character" , "numeric") 
+                  , dec = "." , nrows=100)
+
+classes <- sapply(data, class)
+
+classes
+
+
+
+data <- read.csv2("data/inflation.csv", header = FALSE 
+                  , col.names = c("cdate" , "inflation")
+                  , colClasses = classes # c("character" , "numeric") 
                   , dec = ".")
 # data$FixedDate <- as.Date(data$Date,format="%d/%m/%Y")
 
 # data$date1 <- replaces(data$cdate)
 data$date <- as.Date(replaces(data$cdate),format="%d/%m/%Y")
 
-head(data , 10)
+# head(data , 10)
+
+class(data$date)
 
 plot(data$date[20:500] , data$inflation[20:500]
      , main="Argentine Inflation")

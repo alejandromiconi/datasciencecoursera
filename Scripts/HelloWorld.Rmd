@@ -17,27 +17,76 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 
-## Load data!
+replaces<-function(vector) {
 
-<!--data <- scan("data/inflation.csv", what = list(date = "" , inflation= 0), sep=";")-->
+    nvector <- c()
+    
+    for ( i in 1:length(vector)) {
+  
+      str <- vector[i]
+      
+        
+      nstr <- ""
+      for ( j in 1:nchar(str)) {
 
-data <- read.csv2("data/inflation.csv",colClasses="character,numeric" , header = FALSE)
-data$FixedDate <- as.Date(data$Date,format="%d/%m/%Y")
+        ch <- substr(str , j , j)
+        
+        # if (i==1) {
+        #   message(j , ch)
+        # }
+        
+        if (grepl("[0-9/]" , ch)) {
+          nstr <- paste(nstr , ch , sep="")
+        }
+      }
+
+      nvector <- append(nvector , nstr)       
+    }
+  
+    return (nvector)
+}
+
+
+tempo <- read.csv2("data/inflation.csv", nrows=100)
+
+classes <- sapply(tempo, class)
+
+tempo
+
+data <- read.csv2("data/inflation.csv", header = FALSE 
+                  , col.names = c("cdate" , "inflation")
+                  , colClasses = classes # c("character" , "numeric") 
+                  , dec = ".")
+  
+data$date <- as.Date(replaces(data$cdate),format="%d/%m/%Y")
+
+# Memory
+# Rows x Columns x 8 bytes for numerics
+# 361 x ( 1 x 10 bytes char date + 1 x 8 bytes numeric + 1 x 8? date) = 361 x 26 = 9398 bytes = 10 Kb
+
+# head(data)
 
 ```{r data}
 summary(data)
 ```
 
-```{r cars}
-summary(cars)
-```
+
+class(data$date)
+
+
 
 ## Including Plots
 
 You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
+```{r data, echo=FALSE}
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+strDates <- c("01/01/1990", "12/31/2020")
+xs <- as.Date(strDates, "%m/%d/%Y")
+
+
+
+plot(data$date[20:500] , data$inflation[20:500] 
+     , main="Argentine Inflation" , xlab="Years", ylab="Inflation" 
+     , xlim=xs, ylim=c(0, 6))
+```
